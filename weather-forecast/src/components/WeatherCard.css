@@ -1,0 +1,22 @@
+.weather-card {
+    text-align: center;
+    margin: 20px auto; /*Centraliza o card*/
+    width: 80%; /*Parte cinza*/
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: #f0f4f8;
+    
+}
+
+.weather-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.weather-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}

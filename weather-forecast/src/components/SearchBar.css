@@ -1,0 +1,31 @@
+.search-bar{
+    display: flex;
+    align-items: center;
+    justify-content: center; /*Centraliza o campo de entrada e o botão*/
+    margin: 20px auto; /*Ajusta a margem para o centro */
+    
+}
+
+.search-bar input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+}
+
+.search-bar button:hover{
+    background-color: #0056b3;
+}

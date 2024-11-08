@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './WeatherCard.css';
 
 function WeatherCard({ cidade, temperatura, descricao, icon }) {
     return (
@@ -7,7 +7,7 @@ function WeatherCard({ cidade, temperatura, descricao, icon }) {
             <h2>{cidade}</h2>
             <div className="weather-info">
                 <img src={icon} alt={descricao} className="weather-icon" />
-                <p>{tempreatura}°C</p>
+                <p>{temperatura}°C</p>
             </div>
             <p>{descricao}</p>
 
