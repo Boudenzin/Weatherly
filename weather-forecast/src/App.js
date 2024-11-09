@@ -4,7 +4,7 @@ import WeatherCard from './components/WeatherCard';
 import iconSun from './assets/3d-weather-icons/sun/26.png';
 import './App.css';
 
-const API_KEY = 'c115fe8faf37c1763e9a1814c362cea1';
+const API_KEY = process.env.REACT_APP_API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
 function App() {

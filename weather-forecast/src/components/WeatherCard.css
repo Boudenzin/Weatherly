@@ -2,7 +2,7 @@
     text-align: center;
     margin: 20px auto; /*Centraliza o card*/
     width: 80%; /*Parte cinza*/
-    max-width: 400px;
+    max-width: 400px; /*Limitação de px da parte cinza*/
     padding: 20px;
     border-radius: 20px;
     background-color: #f0f4f8;
