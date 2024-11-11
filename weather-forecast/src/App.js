@@ -13,18 +13,36 @@ function App() {
   const [dadosDoClima, setDadosDoClima] = useState(null);
 
   
-  const handleCitySearch = (city) => {
-    console.log('Buscando a previsão do tempo para: ${city}');
-    //Integração futura da API OpenWeather
-  };
+  const handleCitySearch = async(city) => {
+    try {
+      console.log('Buscando a previsão do tempo para: ${city}');
+      const response = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`); //Deixa em graus ceulsius e em br
+      const dado = await response.json();
 
-  const mockWeatherData = {
-    cidade: "São Paulo",
-    temperatura: 25,
-    descricao: "Ensolarado",
-    icon: iconSun
+      if (dado.cod === 200) {
+        setDadosDoClima({
+          cidade: dado.name,
+          temperatura: Math.round(dado.main.temp),
+          descricao: dado.weather[0].description,
+          icon: `http://openweathermap.org/img/wn/${dado.weather[0].icon}@2x.png`
+        });
+      
+    } else {
+      alert('Cidade não encontrada');
+    }
+   
+  } catch (error){
+    console.error("Erro ao buscar dados:", error);
+  }
+};
 
-  };
+  //const mockWeatherData = {
+    //cidade: "São Paulo",
+    //temperatura: 25,
+    //descricao: "Ensolarado",
+    //icon: iconSun
+
+  //};
 
 
 
@@ -36,13 +54,14 @@ function App() {
       <SearchBar onSearch={handleCitySearch}/>
       <div className="weather-cards">
         {/* Renderização de múltiplos WatherCard para cada previsão */}
-        <WeatherCard 
-          cidade={mockWeatherData.cidade}
-          temperatura={mockWeatherData.temperatura}
-          descricao={mockWeatherData.descricao}
-          icon={mockWeatherData.icon}
+        {dadosDoClima && (<WeatherCard 
+          cidade={dadosDoClima.cidade}
+          temperatura={dadosDoClima.temperatura}
+          descricao={dadosDoClima.descricao}
+          icon={dadosDoClima.icon}
         
         />
+        )}
       </div>
     </div>
   );
