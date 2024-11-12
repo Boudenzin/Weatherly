@@ -1,11 +1,20 @@
 import React, {useState} from 'react';
 import SearchBar from './components/SearchBar'
 import WeatherCard from './components/WeatherCard';
-import iconSun from './assets/3d-weather-icons/sun/26.png';
+import { getWeatherIcon } from './util/getWeatherIcon';
 import './App.css';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
+
+function capitalizarDescricao(description) {
+  return description
+    .toLowerCase()
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 
 function App() {
 
@@ -20,11 +29,21 @@ function App() {
       const dado = await response.json();
 
       if (dado.cod === 200) {
+
+        const horaAtual = Date.now() / 1000; //Hora atual em segundos
+
+        //Determina se é dia ou noite
+
+        const ehDeDia = horaAtual >= dado.sys.sunrise && horaAtual < dado.sys.sunset;
+
+        const weatherIcon = getWeatherIcon(dado.weather[0].description, ehDeDia);
+
         setDadosDoClima({
           cidade: dado.name,
           temperatura: Math.round(dado.main.temp),
-          descricao: dado.weather[0].description,
-          icon: `http://openweathermap.org/img/wn/${dado.weather[0].icon}@2x.png`
+          descricao: capitalizarDescricao(dado.weather[0].description),
+          icon: weatherIcon,
+          ehDeDia
         });
       
     } else {
