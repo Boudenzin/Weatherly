@@ -42,6 +42,8 @@ function App() {
           cidade: dado.name,
           temperatura: Math.round(dado.main.temp),
           descricao: capitalizarDescricao(dado.weather[0].description),
+          vento: `${dado.wind.speed} m/s`,
+          umidade: `${dado.main.humidity}%`,
           icon: weatherIcon,
           ehDeDia
         });
@@ -78,6 +80,8 @@ function App() {
           temperatura={dadosDoClima.temperatura}
           descricao={dadosDoClima.descricao}
           icon={dadosDoClima.icon}
+          vento={dadosDoClima.vento}
+          umidade={dadosDoClima.umidade}
         
         />
         )}
