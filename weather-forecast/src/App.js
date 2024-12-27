@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
 import SearchBar from './components/SearchBar'
 import WeatherCard from './components/WeatherCard';
+import WeatherChart from './components/WeatherChart';
 import { getWeatherIcon } from './util/getWeatherIcon';
 import './App.css';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
 
 function capitalizarDescricao(description) {
   return description
@@ -20,33 +22,40 @@ function App() {
 
 
   const [dadosDoClima, setDadosDoClima] = useState(null);
+  const [dadosPrevisao, setDadosPrevisao] = useState(null);
 
   
   const handleCitySearch = async(city) => {
     try {
       console.log('Buscando a previsão do tempo para: ${city}');
-      const response = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`); //Deixa em graus ceulsius e em br
-      const dado = await response.json();
+      const weatherResponse = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`); //Deixa em graus ceulsius e em br
+      const dadoAtual = await weatherResponse.json();
 
-      if (dado.cod === 200) {
+      if (dadoAtual.cod === 200) {
+
+        const forecastResponse = await fetch(`${FORECAST_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`);
+        const dadoFuturo = await forecastResponse.json();
+
 
         const horaAtual = Date.now() / 1000; //Hora atual em segundos
 
         //Determina se é dia ou noite
 
-        const ehDeDia = horaAtual >= dado.sys.sunrise && horaAtual < dado.sys.sunset;
+        const ehDeDia = horaAtual >= dadoAtual.sys.sunrise && horaAtual < dadoAtual.sys.sunset;
 
-        const weatherIcon = getWeatherIcon(dado.weather[0].description, ehDeDia);
+        const weatherIcon = getWeatherIcon(dadoAtual.weather[0].description, ehDeDia);
 
         setDadosDoClima({
-          cidade: dado.name,
-          temperatura: Math.round(dado.main.temp),
-          descricao: capitalizarDescricao(dado.weather[0].description),
-          vento: `${dado.wind.speed} m/s`,
-          umidade: `${dado.main.humidity}%`,
+          cidade: dadoAtual.name,
+          temperatura: Math.round(dadoAtual.main.temp),
+          descricao: capitalizarDescricao(dadoAtual.weather[0].description),
+          vento: `${dadoAtual.wind.speed} m/s`,
+          umidade: `${dadoAtual.main.humidity}%`,
           icon: weatherIcon,
           ehDeDia
         });
+
+        setDadosPrevisao(dadoFuturo);
       
     } else {
       alert('Cidade não encontrada');
@@ -85,6 +94,7 @@ function App() {
         
         />
         )}
+        {dadosPrevisao && <WeatherChart dadosPrevisao={dadosPrevisao} />}
       </div>
     </div>
   );
