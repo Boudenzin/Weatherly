@@ -11,7 +11,10 @@ const WeatherChart = ({ dadosPrevisao }) => {
     }
 
     const intervals = dadosPrevisao.list.slice(0, 5);
-    const labels = intervals.map(item => item.dt_txt.split("")[1]);
+    const labels = intervals.map(item => {
+        const horaCompleta = item.dt_txt.split(" ")[1]; // Exemplo: "15:00:00"
+        return horaCompleta.substring(0, 5); // Retorna "15:00"
+    });
     const temperatures = intervals.map(item => item.main.temp);
 
     const data = {

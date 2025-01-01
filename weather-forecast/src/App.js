@@ -94,7 +94,12 @@ function App() {
         
         />
         )}
-        {dadosPrevisao && <WeatherChart dadosPrevisao={dadosPrevisao} />}
+       {dadosPrevisao && (
+  <div className="weather-chart-container">
+    <WeatherChart dadosPrevisao={dadosPrevisao} />
+  </div>
+)}
+
       </div>
     </div>
   );
