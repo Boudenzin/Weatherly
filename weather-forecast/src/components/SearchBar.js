@@ -18,6 +18,13 @@ function SearchBar({ onSearch }) {
             setCidade(''); //Limpa o campo de entrada após a busca
         }
     };
+
+    // Detecta a tecla Enter no campo de texto
+    const handleKeyDown = event => {
+        if (event.key === 'Enter') {
+            handleSearch(); // Chama a função de busca ao pressionar Enter
+        }
+    }
     
     return (
         <div className="search-bar">
@@ -25,6 +32,7 @@ function SearchBar({ onSearch }) {
                 type="text"
                 value={cidade}
                 onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 placeholder='Digite o nome da cidade' //Texto que vai aparecer quando estiver vazio
             ></input>
             <button onClick={handleSearch}>Buscar</button>
