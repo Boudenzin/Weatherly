@@ -1,30 +1,49 @@
+// Importa React e o hook useState para gerenciar estado local
 import React, { useState } from 'react';
+// Importa o CSS específico do componente
 import "./SearchBar.css";
 
+/**
+ * Componente SearchBar
+ * 
+ * Permite ao usuário digitar o nome de uma cidade e iniciar uma busca
+ * de previsão do tempo. Chama a função 'onSearch' passada via props.
+ * 
+ * @param {function} onSearch - Função que será chamada ao buscar uma cidade
+ */
 function SearchBar({ onSearch }) {
+    
+    // Estado que armazena o valor digitado no input
     const [cidade, setCidade] = useState('');
-    //Criação de Constantes começando com "" e podendo ser alteradas com setCidade [constante, como vamos altera-la ou valor dela]
 
-    //Sempre que o usuário entrar no campo de digitação essa função é chamada
+    /**
+     * Atualiza o estado 'cidade' sempre que o usuário digita algo no input.
+     * @param {object} event - Evento disparado pelo input
+     */
     const handleInputChange = event => {
-        //Esse setCidade(o que está dentro é justamente o que foi digitado)
         setCidade(event.target.value);
     };
     
-    //Função chamada quando o usuário clica no botão Buscar
+    /**
+     * Chama a função de busca (onSearch) se a cidade tiver sido preenchida.
+     * Também limpa o input após a busca.
+     */
     const handleSearch = () => {
         if (cidade.trim()) {
-            onSearch(cidade); //chama a funcão onSearch do App.js e envia city como argumento
-            setCidade(''); //Limpa o campo de entrada após a busca
+            onSearch(cidade); // Chama a função recebida do componente pai
+            setCidade('');    // Limpa o campo de texto
         }
     };
 
-    // Detecta a tecla Enter no campo de texto
+    /**
+     * Detecta a tecla Enter no input e chama a busca.
+     * @param {object} event - Evento do teclado
+     */
     const handleKeyDown = event => {
         if (event.key === 'Enter') {
-            handleSearch(); // Chama a função de busca ao pressionar Enter
+            handleSearch();
         }
-    }
+    };
     
     return (
         <div className="search-bar">
@@ -33,12 +52,12 @@ function SearchBar({ onSearch }) {
                 value={cidade}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder='Digite o nome da cidade' //Texto que vai aparecer quando estiver vazio
-            ></input>
+                placeholder='Digite o nome da cidade'
+            />
             <button onClick={handleSearch}>Buscar</button>
         </div>
     );
 }
 
-//Uso em outros arquivos
+// Exporta o componente para ser utilizado em outros arquivos
 export default SearchBar;
