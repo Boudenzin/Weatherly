@@ -1,55 +1,45 @@
-import React, { useState } from 'react';
-import SearchBar from './components/SearchBar'; // Componente de busca de cidade
-import WeatherCard from './components/WeatherCard'; // Componente que mostra o clima atual
-import WeatherChart from './components/WeatherChart'; // Componente com o gráfico da previsão
-import { getWeatherIcon } from './util/getWeatherIcon'; // Função utilitária que seleciona o ícone do clima
-import './App.css'; // Estilo geral da aplicação
+import React, {useState} from 'react';
+import SearchBar from './components/SearchBar'
+import WeatherCard from './components/WeatherCard';
+import { getWeatherIcon } from './util/getWeatherIcon';
+import './App.css';
 
-// Constantes com URLs das APIs da OpenWeatherMap
-const API_KEY = process.env.REACT_APP_API_KEY; // Chave da API (vinda de .env)
-const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather'; // URL para clima atual
-const FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast'; // URL para previsão
+const API_KEY = process.env.REACT_APP_API_KEY;
+const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
 
-// Função auxiliar que capitaliza as palavras da descrição do tempo
 function capitalizarDescricao(description) {
   return description
-    .toLowerCase() // converte tudo para minúsculo
-    .split(" ") // divide a string em palavras
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // capitaliza a primeira letra de cada palavra
-    .join(" "); // junta tudo novamente com espaço
+    .toLowerCase()
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
+
 function App() {
-  // Estado para guardar dados do clima atual
+
+
   const [dadosDoClima, setDadosDoClima] = useState(null);
-  // Estado para guardar dados da previsão futura
   const [dadosPrevisao, setDadosPrevisao] = useState(null);
 
-  // Função que busca os dados da cidade pesquisada (chamada ao clicar em "Buscar" ou pressionar Enter)
-  const handleCitySearch = async (city) => {
+  
+  const handleCitySearch = async(city) => {
     try {
       console.log('Buscando a previsão do tempo para: ${city}');
-      
-      // Faz requisição para clima atual
-      const weatherResponse = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`);
+      const weatherResponse = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`); //Deixa em graus ceulsius e em br
       const dadoAtual = await weatherResponse.json();
 
-      // Verifica se a cidade foi encontrada (código 200)
       if (dadoAtual.cod === 200) {
-        // Faz requisição para previsão
-        const forecastResponse = await fetch(`${FORECAST_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`);
-        const dadoFuturo = await forecastResponse.json();
 
-        // Hora atual em segundos
-        const horaAtual = Date.now() / 1000;
+        const horaAtual = Date.now() / 1000; //Hora atual em segundos
 
-        // Verifica se é dia (com base no nascer/pôr do sol)
+        //Determina se é dia ou noite
+
         const ehDeDia = horaAtual >= dadoAtual.sys.sunrise && horaAtual < dadoAtual.sys.sunset;
 
-        // Pega o ícone correspondente ao tempo
         const weatherIcon = getWeatherIcon(dadoAtual.weather[0].description, ehDeDia);
 
-        // Atualiza o estado com os dados formatados do clima atual
         setDadosDoClima({
           cidade: dadoAtual.name,
           temperatura: Math.round(dadoAtual.main.temp),
@@ -60,45 +50,50 @@ function App() {
           ehDeDia
         });
 
-        // Atualiza estado com dados da previsão futura
+        //Fetch para prever os proximos horarios
+        const forecastResponse = await fetch(`${FORECAST_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`);
+        const dadoFuturo = await forecastResponse.json();
         setDadosPrevisao(dadoFuturo);
-      } else {
-        alert('Cidade não encontrada');
-      }
-
-    } catch (error) {
-      console.error("Erro ao buscar dados:", error);
+    } else {
+      alert('Cidade não encontrada');
     }
-  };
+   
+  } catch (error){
+    console.error("Erro ao buscar dados:", error);
+  }
+};
+
+  //const mockWeatherData = {
+    //cidade: "São Paulo",
+    //temperatura: 25,
+    //descricao: "Ensolarado",
+    //icon: iconSun
+
+  //};
+
+
+
 
   return (
     <div className="App">
       <h1>Previsão do Tempo</h1>
       <p>Digite o nome de uma cidade para ver a previsão do tempo</p>
-
-      {/* Componente de busca */}
-      <SearchBar onSearch={handleCitySearch} />
-
+      <SearchBar onSearch={handleCitySearch}/>
       <div className="weather-cards">
-        {/* Se já houver dados do clima, exibe o WeatherCard */}
-        {dadosDoClima && (
-          <WeatherCard 
-            cidade={dadosDoClima.cidade}
-            temperatura={dadosDoClima.temperatura}
-            descricao={dadosDoClima.descricao}
-            icon={dadosDoClima.icon}
-            vento={dadosDoClima.vento}
-            umidade={dadosDoClima.umidade}
-          />
-        )}
-
-        {/* Se já houver dados de previsão, exibe o gráfico */}
-        {dadosPrevisao && (
-          <div className="weather-chart-container">
-            <WeatherChart dadosPrevisao={dadosPrevisao} />
-          </div>
+        {/* Renderização de múltiplos WatherCard para cada previsão */}
+        {dadosDoClima && (<WeatherCard 
+          cidade={dadosDoClima.cidade}
+          temperatura={dadosDoClima.temperatura}
+          descricao={dadosDoClima.descricao}
+          icon={dadosDoClima.icon}
+          vento={dadosDoClima.vento}
+          umidade={dadosDoClima.umidade}
+        
+        />
         )}
       </div>
+      {/* Rendereização do gráfico de previsão */}
+      {dadosPrevisao && <WeatherChart forecastData={dadosPrevisao} />}
     </div>
   );
 }
