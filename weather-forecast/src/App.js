@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import SearchBar from './components/SearchBar'; // Componente de busca de cidade
 import WeatherCard from './components/WeatherCard'; // Componente que mostra o clima atual
 import WeatherChart from './components/WeatherChart'; // Componente com o gráfico da previsão
+import DailyForecast from './components/DailyForecast'; // Componente que mostra a previsão diária
 import { getWeatherIcon } from './util/getWeatherIcon'; // Função utilitária que seleciona o ícone do clima
 import './App.css'; // Estilo geral da aplicação
 
@@ -24,6 +25,9 @@ function App() {
   const [dadosDoClima, setDadosDoClima] = useState(null);
   // Estado para guardar dados da previsão futura
   const [dadosPrevisao, setDadosPrevisao] = useState(null);
+  // Estado para guardar dados da previsão diária
+  const [previsaoDiaria, setPrevisaoDiaria] = useState([]);
+
 
   // Função que busca os dados da cidade pesquisada (chamada ao clicar em "Buscar" ou pressionar Enter)
   const handleCitySearch = async (city) => {
@@ -62,6 +66,26 @@ function App() {
 
         // Atualiza estado com dados da previsão futura
         setDadosPrevisao(dadoFuturo);
+
+        // Filtra a previsão das 12h de cada dia (5 dias)
+        const diaria = dadoFuturo.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 5);
+
+        const formatada = diaria.map(item => {
+          const data = new Date(item.dt_txt);
+          const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'short' }); // Ex: seg, ter
+          const descricao = capitalizarDescricao(item.weather[0].description);
+          const icone = getWeatherIcon(item.weather[0].description, true); // Consideramos dia
+
+          return {
+            data: diaSemana,
+            temp: Math.round(item.main.temp),
+            descricao,
+            icon: icone
+          };
+        });
+
+        setPrevisaoDiaria(formatada);
+
       } else {
         alert('Cidade não encontrada');
       }
@@ -98,6 +122,11 @@ function App() {
             <WeatherChart dadosPrevisao={dadosPrevisao} />
           </div>
         )}
+        {/* Se já houver dados de previsão diária, exibe o DailyForecast */}
+        {previsaoDiaria.length > 0 && (
+          <DailyForecast previsao={previsaoDiaria} />
+        )}
+
       </div>
     </div>
   );
