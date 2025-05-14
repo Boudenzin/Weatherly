@@ -97,7 +97,15 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Previsão do Tempo</h1>
+
+      {/* Logo no topo */}
+            {/* Logo no topo */}
+      <header className="app-header">
+        <img src="/assets/logos/logo.png" alt="Logo do site" className="logo" />
+        <h1>Previsão do Tempo</h1>
+      </header>
+
+      {/* Texto de instrução */}
       <p>Digite o nome de uma cidade para ver a previsão do tempo</p>
 
       {/* Componente de busca */}

@@ -1,76 +1,74 @@
-// Importa a biblioteca React
+// WeatherChart.js
 import React from 'react';
-// Importa o arquivo CSS para estilização do gráfico
-import './WeatherChart.css';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 
-// Importa o componente Line do pacote react-chartjs-2 para criação de gráficos de linha
-import { Line } from 'react-chartjs-2';
-
-// Importa os módulos necessários da biblioteca Chart.js
-import { Chart as ChartJS, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
-
-// Registra os módulos importados no ChartJS (necessário para o gráfico funcionar)
-ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
-
-/**
- * Componente WeatherChart
- * 
- * Exibe um gráfico de linha com a previsão de temperatura para os próximos intervalos de tempo.
- * 
- * @param {Object} dadosPrevisao - Objeto contendo a lista de previsões meteorológicas
- * @param {Array} dadosPrevisao.list - Lista de objetos de previsão para cada horário
- */
-const WeatherChart = ({ dadosPrevisao }) => {
-    // Se os dados ainda não foram carregados, exibe uma mensagem de carregamento
-    if (!dadosPrevisao || !dadosPrevisao.list) {
-        return <div>Carregando gráfico...</div>;
-    }
-
-    // Filtra os próximos 5 intervalos de tempo da previsão
-    const intervals = dadosPrevisao.list.slice(0, 5);
-
-    // Extrai apenas as horas dos dados de previsão
-    const labels = intervals.map(item => {
-        const horaCompleta = item.dt_txt.split(" ")[1]; // Exemplo: "15:00:00"
-        return horaCompleta.substring(0, 5); // Retorna "15:00"
+function WeatherChart({ dadosPrevisao }) {
+  // Pegamos os próximos 5 blocos de 3h (total: 15 horas)
+  const dados = dadosPrevisao.list.slice(0, 5).map(item => {
+    const hora = new Date(item.dt_txt).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
 
-    // Extrai as temperaturas correspondentes aos intervalos selecionados
-    const temperatures = intervals.map(item => item.main.temp);
-
-    // Configura os dados que serão exibidos no gráfico
-    const data = {
-        labels, // Horários no eixo X
-        datasets: [
-            {
-                label: 'Temperatura', // Nome da linha do gráfico
-                data: temperatures, // Valores de temperatura
-                fill: true, // Preenche a área sob a linha
-                borderColor: 'rgb(75, 192, 192)', // Cor da linha
-                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Cor de preenchimento
-                tension: 0.4, // Suaviza as curvas da linha
-            },
-        ],
+    return {
+      hora,
+      temperatura: Math.round(item.main.temp),
+      descricao: item.weather[0].description,
+      umidade: item.main.humidity,
+      vento: item.wind.speed
     };
+  });
 
-    // Configurações adicionais do gráfico
-    const options = {
-        responsive: true, // Torna o gráfico responsivo
-        plugins: {
-            legend: {
-                position: 'top', // Posiciona a legenda no topo
-            },
-        },
-        scales: {
-            y: {
-                beginAtZero: false, // Eixo Y começa no valor mínimo dos dados, não no zero
-            },
-        },
-    };
+  return (
+    <div style={{ width: '100%', height: 300 }}>
+      <ResponsiveContainer>
+        <LineChart
+          data={dados}
+          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="hora" />
+          <YAxis unit="°C" />
+          <Tooltip
+            formatter={(valor, nome) => {
+              switch (nome) {
+                case 'temperatura':
+                  return [`${valor} °C`, 'Temperatura'];
+                default:
+                  return valor;
+              }
+            }}
+            labelFormatter={(label, payload) => {
+              if (payload && payload.length > 0) {
+                const dadosTooltip = payload[0].payload;
+                return `${label} - ${dadosTooltip.descricao
+                  .charAt(0)
+                  .toUpperCase() + dadosTooltip.descricao.slice(1)}`;
+              }
+              return label;
+            }}
+            contentStyle={{ backgroundColor: '#f5f5f5', borderRadius: '8px' }}
+          />
+          <Line
+            type="monotone"
+            dataKey="temperatura"
+            stroke="#2f80ed"
+            strokeWidth={3}
+            dot={{ r: 5 }}
+            activeDot={{ r: 8 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
-    // Renderiza o gráfico de linha com os dados e opções definidas
-    return <Line data={data} options={options} />;
-};
-
-// Exporta o componente para que possa ser usado em outros arquivos
 export default WeatherChart;
