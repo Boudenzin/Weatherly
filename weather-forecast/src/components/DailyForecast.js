@@ -8,8 +8,8 @@ function DailyForecast({ previsao }) {
         <div key={index} className="forecast-card">
           <p className="forecast-date">{dia.data}</p>
           <img src={dia.icon} alt="Ícone do clima" className="forecast-icon" />
-          <p>{dia.descricao}</p>
-          <p><strong>{dia.temp}°C</strong></p>
+          <p className="forecast-description">{dia.descricao}</p>
+          <p className="forecast-temp">{dia.temp}°C</p>
         </div>
       ))}
     </div>
