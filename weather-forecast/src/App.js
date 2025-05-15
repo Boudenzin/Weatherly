@@ -32,7 +32,7 @@ function App() {
   // Função que busca os dados da cidade pesquisada (chamada ao clicar em "Buscar" ou pressionar Enter)
   const handleCitySearch = async (city) => {
     try {
-      console.log('Buscando a previsão do tempo para: ${city}');
+      console.log(`Buscando a previsão do tempo para: ${city}`);
       
       // Faz requisição para clima atual
       const weatherResponse = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`);
