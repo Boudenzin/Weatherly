@@ -1,5 +1,7 @@
 // WeatherChart.js
 import React from 'react';
+import './WeatherChart.css'; // Estilos para o gráfico
+// Importando os componentes necessários da biblioteca Recharts
 import {
   LineChart,
   Line,
@@ -28,8 +30,8 @@ function WeatherChart({ dadosPrevisao }) {
   });
 
   return (
-    <div style={{ width: '100%', height: 300 }}>
-      <ResponsiveContainer>
+    <div className="weather-chart-container">
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={dados}
           margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
