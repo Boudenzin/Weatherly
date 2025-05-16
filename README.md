@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="weather-forecast/public/assets/logos/logo-white.png" alt="Weatherly Logo" width="200"/>
+  <img src="weather-forecast/public/assets/logos/logo-icon.png" alt="Weatherly Logo" width="200"/>
 </p>
 
 <h1 align="center">Weatherly</h1>
