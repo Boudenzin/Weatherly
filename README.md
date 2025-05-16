@@ -1,4 +1,8 @@
-# Weatherly
+<p align="center">
+  <img src="weather-forecast/public/assets/logos/logo-white.png" alt="Weatherly Logo" width="200"/>
+</p>
+
+<h1 align="center">Weatherly</h1>
 
 O **Weatherly** é um site de previsão do tempo desenvolvido com **React**, **JavaScript** e **Chart.js**. O objetivo principal é fornecer uma interface intuitiva e visualmente atraente para os usuários consultarem a previsão do tempo de qualquer cidade. O projeto foi criado como parte de um **Project-Based Learning (PBL)** para aprimorar habilidades em desenvolvimento web com React e integração de APIs.
 
