@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import SearchBar from './components/SearchBar'; // Componente de busca de cidade
 import WeatherCard from './components/WeatherCard'; // Componente que mostra o clima atual
 import WeatherChart from './components/WeatherChart'; // Componente com o gráfico da previsão
@@ -27,6 +28,72 @@ function App() {
   const [dadosPrevisao, setDadosPrevisao] = useState(null);
   // Estado para guardar dados da previsão diária
   const [previsaoDiaria, setPrevisaoDiaria] = useState([]);
+
+useEffect(() => {
+  // Tenta obter a localização do usuário
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+
+      try {
+        console.log(`Buscando clima para coordenadas: ${latitude}, ${longitude}`);
+
+        // Requisição para clima atual com coordenadas
+        const weatherResponse = await fetch(`${BASE_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric&lang=pt_br`);
+        const dadoAtual = await weatherResponse.json();
+
+        if (dadoAtual.cod === 200) {
+          // Requisição para previsão futura
+          const forecastResponse = await fetch(`${FORECAST_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric&lang=pt_br`);
+          const dadoFuturo = await forecastResponse.json();
+
+          const horaAtual = Date.now() / 1000;
+          const ehDeDia = horaAtual >= dadoAtual.sys.sunrise && horaAtual < dadoAtual.sys.sunset;
+
+          const weatherIcon = getWeatherIcon(dadoAtual.weather[0].description, ehDeDia);
+
+          setDadosDoClima({
+            cidade: dadoAtual.name,
+            temperatura: Math.round(dadoAtual.main.temp),
+            descricao: capitalizarDescricao(dadoAtual.weather[0].description),
+            vento: `${dadoAtual.wind.speed} m/s`,
+            umidade: `${dadoAtual.main.humidity}%`,
+            icon: weatherIcon,
+            ehDeDia
+          });
+
+          const diaria = dadoFuturo.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 5);
+          const formatada = diaria.map(item => {
+            const data = new Date(item.dt_txt);
+            const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'short' });
+            const descricao = capitalizarDescricao(item.weather[0].description);
+            const icone = getWeatherIcon(item.weather[0].description, true);
+            return {
+              data: diaSemana,
+              temp: Math.round(item.main.temp),
+              descricao,
+              icon: icone
+            };
+          });
+
+          setPrevisaoDiaria(formatada);
+          setDadosPrevisao(dadoFuturo);
+
+        } else {
+          alert('Não foi possível obter o clima atual com a geolocalização.');
+        }
+
+      } catch (error) {
+        console.error('Erro ao buscar dados do clima com geolocalização:', error);
+      }
+
+    }, (error) => {
+      console.warn('Erro ao obter geolocalização:', error);
+    });
+  } else {
+    console.warn('Geolocalização não é suportada neste navegador.');
+  }
+}, []);
 
 
   // Função que busca os dados da cidade pesquisada (chamada ao clicar em "Buscar" ou pressionar Enter)
