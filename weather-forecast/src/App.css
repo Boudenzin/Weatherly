@@ -49,3 +49,53 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* Aqui fica o CSS do weather-container */
+
+.weather-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Coluna da esquerda maior que a da direita */
+  gap:20px;
+  justify-content: center;
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px
+}
+
+.right-column {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Tema Claro */
+.tema-claro {
+  background-color: #f0f0f0;
+  color: #222;
+}
+
+/* Tema Escuro */
+.tema-escuro {
+  background-color: #1e1e1e;
+  color: #eee;
+}
+
+/* Botão de alternar tema */
+.botao-tema {
+  background: none;
+  border: 1px solid currentColor;
+  padding: 0.4em 0.8em;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+
