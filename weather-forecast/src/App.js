@@ -21,6 +21,9 @@ function capitalizarDescricao(description) {
     .join(" "); // junta tudo novamente com espaço
 }
 
+
+
+
 function App() {
   // Estado para guardar dados do clima atual
   const [dadosDoClima, setDadosDoClima] = useState(null);
@@ -29,120 +32,54 @@ function App() {
   // Estado para guardar dados da previsão diária
   const [previsaoDiaria, setPrevisaoDiaria] = useState([]);
 
-useEffect(() => {
-  // Tenta obter a localização do usuário
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const { latitude, longitude } = position.coords;
+  const [temaEscuro, setTemaEscuro] = useState(false);
+  // Função para alternar entre tema claro e escuro
+  const alternarTema = () => {
+  setTemaEscuro(prev => !prev);
+  };
 
-      try {
-        console.log(`Buscando clima para coordenadas: ${latitude}, ${longitude}`);
-
-        // Requisição para clima atual com coordenadas
-        const weatherResponse = await fetch(`${BASE_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric&lang=pt_br`);
-        const dadoAtual = await weatherResponse.json();
-
-        if (dadoAtual.cod === 200) {
-          // Requisição para previsão futura
-          const forecastResponse = await fetch(`${FORECAST_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric&lang=pt_br`);
-          const dadoFuturo = await forecastResponse.json();
-
-          const horaAtual = Date.now() / 1000;
-          const ehDeDia = horaAtual >= dadoAtual.sys.sunrise && horaAtual < dadoAtual.sys.sunset;
-
-          const weatherIcon = getWeatherIcon(dadoAtual.weather[0].description, ehDeDia);
-
-          setDadosDoClima({
-            cidade: dadoAtual.name,
-            temperatura: Math.round(dadoAtual.main.temp),
-            descricao: capitalizarDescricao(dadoAtual.weather[0].description),
-            vento: `${dadoAtual.wind.speed} m/s`,
-            umidade: `${dadoAtual.main.humidity}%`,
-            icon: weatherIcon,
-            ehDeDia
-          });
-
-          const diaria = dadoFuturo.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 5);
-          const formatada = diaria.map(item => {
-            const data = new Date(item.dt_txt);
-            const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'short' });
-            const descricao = capitalizarDescricao(item.weather[0].description);
-            const icone = getWeatherIcon(item.weather[0].description, true);
-            return {
-              data: diaSemana,
-              temp: Math.round(item.main.temp),
-              descricao,
-              icon: icone
-            };
-          });
-
-          setPrevisaoDiaria(formatada);
-          setDadosPrevisao(dadoFuturo);
-
-        } else {
-          alert('Não foi possível obter o clima atual com a geolocalização.');
-        }
-
-      } catch (error) {
-        console.error('Erro ao buscar dados do clima com geolocalização:', error);
-      }
-
-    }, (error) => {
-      console.warn('Erro ao obter geolocalização:', error);
-    });
-  } else {
-    console.warn('Geolocalização não é suportada neste navegador.');
-  }
-}, []);
-
-
-  // Função que busca os dados da cidade pesquisada (chamada ao clicar em "Buscar" ou pressionar Enter)
-  const handleCitySearch = async (city) => {
+  // Função unificada para buscar clima por cidade ou coordenadas
+  const buscarClima = async ({ cidade = null, lat = null, lon = null }) => {
     try {
-      console.log(`Buscando a previsão do tempo para: ${city}`);
-      
-      // Faz requisição para clima atual
-      const weatherResponse = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`);
+      const baseQuery = cidade
+        ? `q=${cidade}`
+        : `lat=${lat}&lon=${lon}`;
+
+      const weatherResponse = await fetch(`${BASE_URL}?${baseQuery}&appid=${API_KEY}&units=metric&lang=pt_br`);
       const dadoAtual = await weatherResponse.json();
 
-      // Verifica se a cidade foi encontrada (código 200)
-      if (dadoAtual.cod === 200) {
-        // Faz requisição para previsão
-        const forecastResponse = await fetch(`${FORECAST_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=pt_br`);
-        const dadoFuturo = await forecastResponse.json();
+      if (dadoAtual.cod !== 200) {
+        alert('Localização não encontrada.');
+        return;
+      }
 
-        // Hora atual em segundos
-        const horaAtual = Date.now() / 1000;
+      const forecastResponse = await fetch(`${FORECAST_URL}?${baseQuery}&appid=${API_KEY}&units=metric&lang=pt_br`);
+      const dadoFuturo = await forecastResponse.json();
 
-        // Verifica se é dia (com base no nascer/pôr do sol)
-        const ehDeDia = horaAtual >= dadoAtual.sys.sunrise && horaAtual < dadoAtual.sys.sunset;
+      const horaAtual = Date.now() / 1000;
+      const ehDeDia = horaAtual >= dadoAtual.sys.sunrise && horaAtual < dadoAtual.sys.sunset;
+      const weatherIcon = getWeatherIcon(dadoAtual.weather[0].description, ehDeDia);
 
-        // Pega o ícone correspondente ao tempo
-        const weatherIcon = getWeatherIcon(dadoAtual.weather[0].description, ehDeDia);
+      setDadosDoClima({
+        cidade: dadoAtual.name,
+        temperatura: Math.round(dadoAtual.main.temp),
+        descricao: capitalizarDescricao(dadoAtual.weather[0].description),
+        vento: `${dadoAtual.wind.speed} m/s`,
+        umidade: `${dadoAtual.main.humidity}%`,
+        icon: weatherIcon,
+        ehDeDia
+      });
 
-        // Atualiza o estado com os dados formatados do clima atual
-        setDadosDoClima({
-          cidade: dadoAtual.name,
-          temperatura: Math.round(dadoAtual.main.temp),
-          descricao: capitalizarDescricao(dadoAtual.weather[0].description),
-          vento: `${dadoAtual.wind.speed} m/s`,
-          umidade: `${dadoAtual.main.humidity}%`,
-          icon: weatherIcon,
-          ehDeDia
-        });
+      setDadosPrevisao(dadoFuturo);
 
-        // Atualiza estado com dados da previsão futura
-        setDadosPrevisao(dadoFuturo);
-
-        // Filtra a previsão das 12h de cada dia (5 dias)
-        const diaria = dadoFuturo.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 5);
-
-        const formatada = diaria.map(item => {
+      const diaria = dadoFuturo.list
+        .filter(item => item.dt_txt.includes("12:00:00"))
+        .slice(0, 5)
+        .map(item => {
           const data = new Date(item.dt_txt);
-          const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'short' }); // Ex: seg, ter
+          const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'short' });
           const descricao = capitalizarDescricao(item.weather[0].description);
-          const icone = getWeatherIcon(item.weather[0].description, true); // Consideramos dia
-
+          const icone = getWeatherIcon(item.weather[0].description, true);
           return {
             data: diaSemana,
             temp: Math.round(item.main.temp),
@@ -151,25 +88,45 @@ useEffect(() => {
           };
         });
 
-        setPrevisaoDiaria(formatada);
-
-      } else {
-        alert('Cidade não encontrada');
-      }
+      setPrevisaoDiaria(diaria);
 
     } catch (error) {
-      console.error("Erro ao buscar dados:", error);
+      console.error('Erro ao buscar dados do clima:', error);
     }
   };
 
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position.coords;
+          buscarClima({ lat: latitude, lon: longitude });
+        },
+        error => console.warn('Erro ao obter geolocalização:', error)
+      );
+    } else {
+      console.warn('Geolocalização não suportada.');
+    }
+  }, []);
+
+
+  // Função que busca os dados da cidade pesquisada (chamada ao clicar em "Buscar" ou pressionar Enter)
+  const handleCitySearch = (city) => {
+    buscarClima({ cidade: city });
+  };
+
+
   return (
-    <div className="App">
+    <div className={`App ${temaEscuro ? 'tema-escuro' : 'tema-claro'}`}>
 
       {/* Logo no topo */}
             {/* Logo no topo */}
       <header className="app-header">
         <img src="/assets/logos/logo.png" alt="Logo do site" className="logo" />
         <h1>Previsão do Tempo</h1>
+        <button className="botao-tema" onClick={alternarTema}>
+          {temaEscuro ? '☀️ Tema Claro' : '🌙 Tema Escuro'}
+        </button>
       </header>
 
       {/* Texto de instrução */}
@@ -178,30 +135,26 @@ useEffect(() => {
       {/* Componente de busca */}
       <SearchBar onSearch={handleCitySearch} />
 
-      <div className="weather-cards">
-        {/* Se já houver dados do clima, exibe o WeatherCard */}
-        {dadosDoClima && (
-          <WeatherCard 
-            cidade={dadosDoClima.cidade}
-            temperatura={dadosDoClima.temperatura}
-            descricao={dadosDoClima.descricao}
-            icon={dadosDoClima.icon}
-            vento={dadosDoClima.vento}
-            umidade={dadosDoClima.umidade}
-          />
-        )}
+      <div className="weather-container">
+        <div className="left-column">
+          {/* Se já houver dados do clima, exibe o WeatherCard */}
+          {dadosDoClima && (
+            <WeatherCard 
+              cidade={dadosDoClima.cidade}
+              temperatura={dadosDoClima.temperatura}
+              descricao={dadosDoClima.descricao}
+              icon={dadosDoClima.icon}
+              vento={dadosDoClima.vento}
+              umidade={dadosDoClima.umidade}
+            />
+          )}
 
-        {/* Se já houver dados de previsão, exibe o gráfico */}
-        {dadosPrevisao && (
-          <div className="weather-chart-container">
-            <WeatherChart dadosPrevisao={dadosPrevisao} />
-          </div>
-        )}
-        {/* Se já houver dados de previsão diária, exibe o DailyForecast */}
-        {previsaoDiaria.length > 0 && (
-          <DailyForecast previsao={previsaoDiaria} />
-        )}
-
+          {previsaoDiaria.length > 0 && <DailyForecast previsao={previsaoDiaria} />}
+        </div>
+        <div className="right-column">
+          {/* Se já houver dados de previsão, exibe o gráfico */}
+          {dadosPrevisao && <WeatherChart dadosPrevisao={dadosPrevisao} />} 
+        </div>
       </div>
     </div>
   );
