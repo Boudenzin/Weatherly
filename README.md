@@ -4,7 +4,7 @@
 
 <h1 align="center">Weatherly</h1>
 
-O **Weatherly** é um site de previsão do tempo desenvolvido com **React**, **JavaScript** e **Chart.js**. O objetivo principal é fornecer uma interface intuitiva e visualmente atraente para os usuários consultarem a previsão do tempo de qualquer cidade. O projeto foi criado como parte de um **Project-Based Learning (PBL)** para aprimorar habilidades em desenvolvimento web com React e integração de APIs.
+O **Weatherly** é um site de previsão do tempo desenvolvido com **React**, **JavaScript** e **Rechart.js**. O objetivo principal é fornecer uma interface intuitiva e visualmente atraente para os usuários consultarem a previsão do tempo de qualquer cidade. O projeto foi criado como parte de um **Project-Based Learning (PBL)** para aprimorar habilidades em desenvolvimento web com React e integração de APIs.
 
 ---
 
@@ -12,7 +12,9 @@ O **Weatherly** é um site de previsão do tempo desenvolvido com **React**, **J
 
 - **Busca por Cidade**: Permite ao usuário buscar a previsão do tempo de qualquer cidade.
 - **Exibição de Dados Atuais**: Mostra a temperatura atual, descrição do clima, velocidade do vento e umidade.
+- **Exibição por Geolocalização**: Ao abrir o servidor, ele pede permissão para localização e exibe a previsão na sua localidade.
 - **Gráfico de Previsão**: Exibe um gráfico de linha com a previsão de temperatura para as próximas horas.
+- **Gráfico de Previsão Diária**: Exibe as previsões dos próximos 5 dias.
 - **Ícones Dinâmicos**: Ícones de clima que mudam de acordo com a descrição do tempo e o período do dia (dia/noite).
 - **Responsividade**: Design adaptável para diferentes tamanhos de tela.
 
@@ -21,7 +23,7 @@ O **Weatherly** é um site de previsão do tempo desenvolvido com **React**, **J
 ## Tecnologias Utilizadas
 
 - **React**: Biblioteca JavaScript para construção da interface do usuário.
-- **Chart.js**: Biblioteca para criação de gráficos interativos.
+- **ReChart.js**: Biblioteca para criação de gráficos interativos.
 - **OpenWeatherMap API**: API usada para obter dados de previsão do tempo.
 - **CSS**: Estilização da interface, incluindo layout, cores e animações.
 - **JavaScript**: Lógica de programação para manipulação de dados e interações.
@@ -43,7 +45,7 @@ O **Weatherly** é um site de previsão do tempo desenvolvido com **React**, **J
 
 2. Navegue até o diretório do projeto:
    ```bash
-   cd Weatherly
+   cd Weatherly/weather-forecast
    ```
 
 3. Instale as dependências:
@@ -76,14 +78,19 @@ O projeto está organizado da seguinte forma:
 
 ```
 Weather-Forecast-Website/
-├── public/                  # Arquivos estáticos (ícones, imagens, etc.).
-├── src/
-│   ├── components/          # Componentes React (SearchBar, WeatherCard, WeatherChart).
-│   ├── util/                # Utilitários (funções auxiliares, como getWeatherIcon).
-│   ├── App.js               # Componente principal da aplicação.
-│   ├── App.css              # Estilos globais.
-│   ├── index.js             # Ponto de entrada da aplicação.
-├── .env                     # Arquivo de configuração para variáveis de ambiente.
+├── node-modules
+├── weather-forecast
+│   ├── public/ # Arquivos estáticos (ícones, imagens, etc.).
+│   ├── src/                 # Arquivos estáticos (ícones, imagens, etc.).
+│   │   ├── components/          # Componentes React (SearchBar, WeatherCard, WeatherChart, DailyForecast).
+│   │   ├── util/                # Utilitários (getWeatherIcon).
+│   │   ├── App.js               # Componente principal da aplicação.
+│   │   ├── App.css              # Estilos globais.
+│   │   ├── index.js             # Ponto de entrada da aplicação.
+│   ├── .env                     # Arquivo de configuração para variáveis de ambiente.
+│   ├── package.json
+├── package-lock.json
+├── LICENSE
 ├── README.md                # Este arquivo.
 ```
 
@@ -108,17 +115,21 @@ Weather-Forecast-Website/
 - **getWeatherIcon.js**:
   - Função que retorna o ícone correto com base na descrição do tempo e no período do dia.
 
+- **DailyForecast.js**:
+  - Exibe os dados dos próximos 5 dias, com descrição e ícones.
+  - Exibe a previsão pelo meio dia.
+
 ---
 
 ## Próximos Objetivos
 
-1. **Previsão de 5 Dias**:
+1. **Previsão de 5 Dias ✅**:
    - Adicionar uma seção para exibir a previsão do tempo para os próximos 5 dias.
 
-2. **Integração com Geolocalização**:
+2. **Integração com Geolocalização ✅**:
    - Usar a API de geolocalização do navegador para buscar automaticamente a previsão do tempo da localização do usuário.
 
-3. **Temas Personalizados**:
+3. **Temas Personalizados (WIP)**:
    - Adicionar temas claros e escuros para melhorar a experiência do usuário.
 
 4. **Testes Automatizados**:
