@@ -38,28 +38,47 @@ function App() {
   setTemaEscuro(prev => !prev);
   };
 
-  // Função unificada para buscar clima por cidade ou coordenadas
+  
+    /**
+   * Função principal para buscar dados do clima atual e previsão futura.
+   * Pode buscar com base em:
+   *   - Nome da cidade (`cidade`)
+   *   - Coordenadas geográficas (`lat` e `lon`)
+   *
+   * @param {Object} params - Parâmetros de busca
+   * @param {string|null} params.cidade - Nome da cidade (opcional)
+   * @param {number|null} params.lat - Latitude (opcional)
+   * @param {number|null} params.lon - Longitude (opcional)
+   */
   const buscarClima = async ({ cidade = null, lat = null, lon = null }) => {
     try {
+      // Monta a query base para a API de acordo com cidade ou coordenadas
       const baseQuery = cidade
         ? `q=${cidade}`
         : `lat=${lat}&lon=${lon}`;
 
+      // Requisição para dados do clima atual
       const weatherResponse = await fetch(`${BASE_URL}?${baseQuery}&appid=${API_KEY}&units=metric&lang=pt_br`);
       const dadoAtual = await weatherResponse.json();
 
+      // Verifica se a resposta foi bem-sucedida
       if (dadoAtual.cod !== 200) {
         alert('Localização não encontrada.');
         return;
       }
 
+      // Requisição para previsão do tempo (5 dias a cada 3h)
       const forecastResponse = await fetch(`${FORECAST_URL}?${baseQuery}&appid=${API_KEY}&units=metric&lang=pt_br`);
       const dadoFuturo = await forecastResponse.json();
 
+      // Determina se é dia ou noite com base no horário atual e nos dados da API
       const horaAtual = Date.now() / 1000;
       const ehDeDia = horaAtual >= dadoAtual.sys.sunrise && horaAtual < dadoAtual.sys.sunset;
+
+      // Busca o ícone de clima correspondente à descrição e período (dia/noite)
       const weatherIcon = getWeatherIcon(dadoAtual.weather[0].description, ehDeDia);
 
+      // Atualiza o estado com os dados do clima atual
       setDadosDoClima({
         cidade: dadoAtual.name,
         temperatura: Math.round(dadoAtual.main.temp),
@@ -70,8 +89,10 @@ function App() {
         ehDeDia
       });
 
+      // Atualiza o estado com todos os dados da previsão (bruto)
       setDadosPrevisao(dadoFuturo);
 
+      // Filtra e formata a previsão diária para os próximos 5 dias (ao meio-dia)
       const diaria = dadoFuturo.list
         .filter(item => item.dt_txt.includes("12:00:00"))
         .slice(0, 5)
@@ -88,6 +109,7 @@ function App() {
           };
         });
 
+      // Atualiza o estado com a previsão diária formatada
       setPrevisaoDiaria(diaria);
 
     } catch (error) {
@@ -95,6 +117,10 @@ function App() {
     }
   };
 
+  /**
+ * useEffect inicial: busca a localização do usuário ao carregar o app
+ * Se a localização for obtida, busca o clima automaticamente com base nas coordenadas.
+ */
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
