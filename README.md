@@ -4,6 +4,12 @@
 
 <h1 align="center">Weatherly</h1>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
+</p>
+
 O **Weatherly** é um site de previsão do tempo desenvolvido com **React**, **JavaScript** e **Rechart.js**. O objetivo principal é fornecer uma interface intuitiva e visualmente atraente para os usuários consultarem a previsão do tempo de qualquer cidade. O projeto foi criado como parte de um **Project-Based Learning (PBL)** para aprimorar habilidades em desenvolvimento web com React e integração de APIs.
 
 ---
@@ -80,7 +86,7 @@ O projeto está organizado da seguinte forma:
 Weather-Forecast-Website/
 ├── node-modules
 ├── weather-forecast
-│   ├── public/ # Arquivos estáticos (ícones, imagens, etc.).
+│   ├── public/ 
 │   ├── src/                 # Arquivos estáticos (ícones, imagens, etc.).
 │   │   ├── components/          # Componentes React (SearchBar, WeatherCard, WeatherChart, DailyForecast).
 │   │   ├── util/                # Utilitários (getWeatherIcon).
@@ -110,7 +116,7 @@ Weather-Forecast-Website/
 
 - **WeatherChart.js**:
   - Cria um gráfico de linha com a previsão de temperatura para as próximas horas.
-  - Usa a biblioteca Chart.js para renderizar o gráfico.
+  - Usa a biblioteca ReChart.js para renderizar o gráfico.
 
 - **getWeatherIcon.js**:
   - Função que retorna o ícone correto com base na descrição do tempo e no período do dia.
